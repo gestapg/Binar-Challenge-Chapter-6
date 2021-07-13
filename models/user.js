@@ -1,9 +1,13 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
-const pathFile = path.join(path.dirname(process.mainModule.filename), "data", "user.json");
+const pathFile = path.join(
+  path.dirname(process.mainModule.filename),
+  'data',
+  'user.json'
+);
 
-const getUserFromFile = (cb) => {
+const getUserFromFile = cb => {
   fs.readFile(pathFile, (err, fileContent) => {
     if (err) {
       cb([]);
@@ -14,7 +18,7 @@ const getUserFromFile = (cb) => {
 };
 
 const loadUsers = () => {
-  const fileBuffer = fs.readFileSync(pathFile, "utf-8");
+  const fileBuffer = fs.readFileSync(pathFile, 'utf-8');
   const users = JSON.parse(fileBuffer);
   return users;
 };
@@ -29,27 +33,21 @@ module.exports = class User {
   }
 
   save() {
-    getUserFromFile((users) => {
+    getUserFromFile(users => {
       this.id = Math.trunc(Math.random() * 1000 + 1).toString();
       users.push(this);
-      fs.writeFile(pathFile, JSON.stringify(users), (err) => {
+      fs.writeFile(pathFile, JSON.stringify(users), err => {
         console.log(err);
       });
     });
   }
 
-  static duplicateCheckUserName = (userName) => {
-    const users = loadUsers();
-    return users.find((user) => user.userName === userName);
-  };
+  static fetchAllData(cb) {
+    getUserFromFile(cb);
+  }
 
-  static duplicateCheckEmail = (email) => {
+  static duplicateCheckUserName = userName => {
     const users = loadUsers();
-    return users.find((user) => user.email === email);
-  };
-
-  static duplicateCheckPassword = (password) => {
-    const users = loadUsers();
-    return users.find((user) => user.password === password);
+    return users.find(user => user.userName === userName);
   };
 };
