@@ -1,14 +1,9 @@
-const express = require("express");
+const express = require('express');
 
 const router = express.Router();
 
-router.get("/", (req, res, next) => {
-  const title = "Home";
-  const style = "main.css";
-  res.render("layouts/main", {
-    title,
-    style,
-  });
-});
+const mainPageController = require('../controllers/game');
+
+router.get('/', mainPageController.getMainPage);
 
 module.exports = router;

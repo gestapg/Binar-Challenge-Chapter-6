@@ -1,13 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const gameController = require('../controllers/game');
 
-router.get('/game/:id', (req, res, next) => {
-  const title = 'Game';
-  const style = 'game.css';
-  res.render('layouts/game', {
-    title,
-    style,
-  });
-});
+router.get('/game/:id', gameController.getGame);
 
 module.exports = router;
