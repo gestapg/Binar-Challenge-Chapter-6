@@ -29,11 +29,13 @@
             </div>
           </div>
           <div class="row">
-            <div class="col text-center">
-              <button class="new-game refresh">
+            <form class="col text-center" action="/game/:id" method="POST">
+              <button class="new-game refresh" type="submit">
                 <img src="/asset2/refresh.png" alt="" />
               </button>
-            </div>
+              <input type="hidden" class="score__result" name="score">
+              <input type="hidden" class="score__result" name="id" value="<%- id %> ">
+            </form>
           </div>
         </div>
       </div>

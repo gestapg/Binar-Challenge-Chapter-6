@@ -1,7 +1,7 @@
 const User = require('../models/user');
 const { check, body, validationResult } = require('express-validator');
 
-// USER SIGN UP
+////////// USER SIGN UP //////////////
 exports.getUserSignUp = (req, res, next) => {
   res.render('layouts/signup', { title: 'Sign Up', style: 'login.css' });
 };
@@ -27,7 +27,6 @@ exports.userValidationSignUp = [
 exports.postUserSignUp = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    //   return res.status(400).json({ errors: errors.array() });
     res.render('layouts/signup', {
       title: 'Sign Up',
       style: 'login.css',
@@ -46,7 +45,7 @@ exports.postUserSignUp = (req, res, next) => {
   }
 };
 
-// USER LOGIN
+////////// USER LOGIN ////////////
 exports.getUserLogin = (req, res, next) => {
   const title = 'Login';
   const style = 'login.css';

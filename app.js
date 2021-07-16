@@ -3,6 +3,8 @@ const express = require('express');
 const app = express();
 const port = 3000;
 
+const errorController = require('./controllers/404');
+
 const mainRoutes = require('./routes/main');
 const loginRoutes = require('./routes/login');
 const gameRoutes = require('./routes/game');
@@ -29,11 +31,7 @@ app.use('/admin', dashboardRoutes);
 app.use(gameRoutes);
 
 // 404 Page Not Found
-app.use((req, res, next) => {
-  const title = 'Page Not Found';
-  const style = '404.css';
-  res.status(404).render('layouts/404', { title, style });
-});
+app.use(errorController.get404Page);
 
 app.listen(port, () => {
   console.log(`You are currently listening on port = ${port}`);
