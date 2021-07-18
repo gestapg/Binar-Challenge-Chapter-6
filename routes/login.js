@@ -7,7 +7,7 @@ router.get('/login', userController.getUserLogin);
 
 router.post(
   '/login',
-  userController.userValidationLogin,
+  // userController.userValidationLogin,
   userController.postUserLogin
 );
 

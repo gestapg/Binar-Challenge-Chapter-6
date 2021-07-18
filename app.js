@@ -1,5 +1,7 @@
 const express = require('express');
 
+// const { sequelize, User } = require('./models');
+
 const app = express();
 const port = 3000;
 
@@ -9,6 +11,7 @@ const mainRoutes = require('./routes/main');
 const loginRoutes = require('./routes/login');
 const gameRoutes = require('./routes/game');
 const signupRoutes = require('./routes/signup');
+const biodataInputRoutes = require('./routes/biodata');
 const dashboardRoutes = require('./routes/admin');
 
 app.set('view engine', 'ejs');
@@ -24,6 +27,8 @@ app.use(loginRoutes);
 
 // method : post & get
 app.use(signupRoutes);
+
+app.use(biodataInputRoutes);
 
 app.use('/admin', dashboardRoutes);
 

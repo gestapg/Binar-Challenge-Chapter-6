@@ -7,7 +7,7 @@ router.get('/signup', userController.getUserSignUp);
 
 router.post(
   '/signup',
-  userController.userValidationSignUp,
+  // userController.userValidationSignUp,
   userController.postUserSignUp
 );
 
