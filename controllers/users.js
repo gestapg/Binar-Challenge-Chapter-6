@@ -7,53 +7,43 @@ exports.getUserSignUp = (req, res, next) => {
   res.render('layouts/signup', { title: 'Sign Up', style: 'login.css' });
 };
 
-// exports.userValidationSignUp = [
-//   body('userName').custom(value => {
-//     const duplicate = User.duplicateCheckUserName(value);
-//     if (duplicate) {
-//       throw new Error('Username already exsist');
-//     }
-//     return true;
-//   }),
-//   check('email', 'Email invalid, example : name@example.com').isEmail(),
-//   body('email').custom(value => {
-//     const duplicate = User.duplicateCheckEmail(value);
-//     if (duplicate) {
-//       throw new Error('Email already exsist');
-//     }
-//     return true;
-//   }),
-// ];
+exports.userValidationSignUp = [
+  body('userName').custom(async value => {
+    const duplicate = await User.findOne({ where: { userName: value } });
+    if (duplicate) {
+      throw new Error('Username already exsist');
+    }
+    return true;
+  }),
+  check('email', 'Email invalid, example : name@example.com').isEmail(),
+  body('email').custom(async value => {
+    const duplicate = await User.findOne({ where: { email: value } });
+    if (duplicate) {
+      throw new Error('Email already exsist');
+    }
+    return true;
+  }),
+];
 
 exports.postUserSignUp = (req, res, next) => {
-  const { userName, email, password } = req.body;
-  User.create({ userName, email, password })
-    .then(result => {
-      const id = result.dataValues.id;
-      res.redirect(`/biodata/${id}`);
-    })
-    .catch(err => {
-      console.log(err);
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.render('layouts/signup', {
+      title: 'Sign Up',
+      style: 'login.css',
+      errors: errors.array(),
     });
-
-  // const errors = validationResult(req);
-  // if (!errors.isEmpty()) {
-  //   res.render('layouts/signup', {
-  //     title: 'Sign Up',
-  //     style: 'login.css',
-  //     errors: errors.array(),
-  //   });
-  // } else {
-  //   const newUser = new User(
-  //     req.body.firstName,
-  //     req.body.lastName,
-  //     req.body.userName,
-  //     req.body.email,
-  //     req.body.password
-  //   );
-  //   newUser.save();
-  //   res.redirect('/login');
-  // }
+  } else {
+    const { userName, email, password } = req.body;
+    User.create({ userName, email, password })
+      .then(result => {
+        const id = result.dataValues.id;
+        res.redirect(`/biodata/${id}`);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
 };
 
 ////////// USER LOGIN ////////////
@@ -63,7 +53,28 @@ exports.getUserLogin = (req, res, next) => {
   res.render('layouts/login', { title, style });
 };
 
+exports.userValidationLogin = body('userName').custom(
+  async (value, { req }) => {
+    const user = await User.findOne({ where: { userName: value } });
+    if (!user) {
+      throw new Error('Invalid Username, Please sign up first!');
+    } else if (user.password !== req.body.password) {
+      throw new Error('Wrong password!!');
+    } else {
+      return true;
+    }
+  }
+);
+
 exports.postUserLogin = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.render('layouts/login', {
+      title: 'Login',
+      style: 'login.css',
+      errors: errors.array(),
+    });
+  }
   const userName = req.body.userName;
   User.findOne({ where: { userName } })
     .then(user => {
@@ -73,32 +84,6 @@ exports.postUserLogin = (req, res, next) => {
       console.log(err);
     });
 };
-
-// exports.userValidationLogin = body('userName').custom((value, { req }) => {
-//   const user = User.duplicateCheckUserName(value);
-//   if (user.email === req.body.email && user.password === req.body.password) {
-//     return true;
-//   } else if (user.email !== req.body.email) {
-//     throw new Error('Invalid email!');
-//   } else if (user.password !== req.body.password) {
-//     throw new Error('Wrong password!!');
-//   } else if (user.userName !== req.body.userName) {
-//     throw new Error('Invalid Username, Please sign up first!');
-//   }
-// });
-
-// exports.postUserLogin = (req, res, next) => {
-//   const errors = validationResult(req);
-//   if (!errors.isEmpty()) {
-//     res.render('layouts/login', {
-//       title: 'Login',
-//       style: 'login.css',
-//       errors: errors.array(),
-//     });
-//   }
-//   const user = User.duplicateCheckUserName(req.body.userName);
-//   res.redirect(`/game/${user.id}?user=${user.userName}`);
-// };
 
 exports.getUserBiodataInput = (req, res, next) => {
   const title = 'Fill in Biodata';
