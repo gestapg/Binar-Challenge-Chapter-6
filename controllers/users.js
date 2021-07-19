@@ -122,6 +122,7 @@ exports.postUserBiodataInput = async (req, res, next) => {
     });
 };
 
+///////////////// ADMIN DASHBOARD ////////////////
 exports.getAdminDashboard = (req, res, next) => {
   User.findAll()
     .then(users => {
@@ -193,4 +194,21 @@ exports.putEditUser = (req, res, next) => {
       });
     })
     .catch(err => console.log(err));
+};
+
+exports.getDeleteUser = (req, res, next) => {
+  const userId = req.params.id;
+  const user = User.findOne({ where: { id: userId } });
+  if (!user) {
+    res.status(404);
+    res.render('layouts/404');
+  } else {
+    User.destroy({ where: { id: userId } }).then(result => {
+      Biodata.destroy({ where: { userId } })
+        .then(result => {
+          res.redirect('/admin/dashboard');
+        })
+        .catch(err => console.log(err));
+    });
+  }
 };

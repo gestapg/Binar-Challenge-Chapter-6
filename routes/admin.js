@@ -10,4 +10,6 @@ router.get('/dashboard/edit/:id', adminControllers.getEditUser);
 
 router.post('/dashboard/update/:id', adminControllers.putEditUser);
 
+router.get('/dashboard/delete/:id', adminControllers.getDeleteUser);
+
 module.exports = router;

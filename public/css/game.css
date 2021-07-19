@@ -81,3 +81,7 @@ img {
   background-color: #9c835f;
   border: none;
 }
+
+.hide {
+  display: none;
+}

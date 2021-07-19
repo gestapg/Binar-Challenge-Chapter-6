@@ -36,6 +36,8 @@ class Game {
 
 let playing = true;
 let score = 0;
+let plays = 0;
+let scoreDisplay = 5;
 
 playerPickBtn.forEach(function (i) {
   i.addEventListener('click', function () {
@@ -45,6 +47,9 @@ playerPickBtn.forEach(function (i) {
       console.log(`Player 1 memilih : ${playerPick}`);
       const playerHighlight = document.querySelector(`.btn--${playerPick}`);
       playerHighlight.classList.add('hidden');
+
+      plays++;
+      scoreDisplay--;
 
       // Player 1 cannot pick again unless its refreshed
       playing = false;
@@ -79,10 +84,23 @@ playerPickBtn.forEach(function (i) {
         }
         document.querySelector('.score__result').value = score;
         console.log(score);
+        console.log(plays);
+        console.log(scoreDisplay);
+        document.querySelector('.score__display').innerHTML = scoreDisplay;
+        console.log(document.querySelector('.score__display'));
+        if (plays === 5) {
+          refreshBtn.classList.add('hide');
+          document.querySelector('.excecute').classList.remove('hide');
+          // console.log(document.querySelector('.excecute'));
+        }
       }, 1000);
     }
   });
 });
+
+// document.querySelector('.play__again').addEventListener('click', function () {
+//   location.reload();
+// // });
 
 refreshBtn.addEventListener('click', function () {
   playing = true;
