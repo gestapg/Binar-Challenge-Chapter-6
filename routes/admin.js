@@ -4,4 +4,10 @@ const adminControllers = require('../controllers/users');
 
 router.get('/dashboard', adminControllers.getAdminDashboard);
 
+router.get('/dashboard/details/:id', adminControllers.getUserDetails);
+
+router.get('/dashboard/edit/:id', adminControllers.getEditUser);
+
+router.post('/dashboard/update/:id', adminControllers.putEditUser);
+
 module.exports = router;

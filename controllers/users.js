@@ -2,6 +2,8 @@
 const { check, body, validationResult, Result } = require('express-validator');
 const { sequelize, User, Biodata } = require('../models');
 
+const Admin = require('../utils/admin');
+
 ////////// USER SIGN UP //////////////
 exports.getUserSignUp = (req, res, next) => {
   res.render('layouts/signup', { title: 'Sign Up', style: 'login.css' });
@@ -55,6 +57,12 @@ exports.getUserLogin = (req, res, next) => {
 
 exports.userValidationLogin = body('userName').custom(
   async (value, { req }) => {
+    if (value === 'admin') {
+      const admin = Admin.duplicateCheckUserName(value);
+      if (admin && admin.password === req.body.password) {
+        return true;
+      } else return false;
+    }
     const user = await User.findOne({ where: { userName: value } });
     if (!user) {
       throw new Error('Invalid Username, Please sign up first!');
@@ -76,15 +84,20 @@ exports.postUserLogin = (req, res, next) => {
     });
   }
   const userName = req.body.userName;
-  User.findOne({ where: { userName } })
-    .then(user => {
-      res.redirect(`/game/${user.id}`);
-    })
-    .catch(err => {
-      console.log(err);
-    });
+  if (userName === 'admin') {
+    res.redirect('/admin/dashboard');
+  } else {
+    User.findOne({ where: { userName } })
+      .then(user => {
+        res.redirect(`/game/${user.id}`);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
 };
 
+//////////// USER INPUT BIODATA ///////////////
 exports.getUserBiodataInput = (req, res, next) => {
   const title = 'Fill in Biodata';
   const style = 'login.css';
@@ -110,11 +123,74 @@ exports.postUserBiodataInput = async (req, res, next) => {
 };
 
 exports.getAdminDashboard = (req, res, next) => {
-  User.fetchAllData(users => {
-    res.render('layouts/dashboard', {
-      title: 'Dashboard',
-      style: 'dashboard.css',
-      users,
+  User.findAll()
+    .then(users => {
+      res.render('layouts/dashboard', {
+        title: 'Dashboard',
+        style: 'dashboard.css',
+        users,
+      });
+    })
+    .catch(err => {
+      console.log(err);
     });
+};
+
+exports.getUserDetails = async (req, res, next) => {
+  const userId = req.params.id;
+  const user = await User.findOne({ where: { id: userId } });
+  const biodata = await Biodata.findOne({ where: { userId } });
+  res.render('layouts/details', {
+    title: 'Details',
+    style: '',
+    user,
+    biodata,
   });
+};
+
+exports.getEditUser = async (req, res, next) => {
+  const userId = req.params.id;
+  const user = await User.findOne({ where: { id: userId } });
+  const biodata = await Biodata.findOne({ where: { userId } });
+
+  res.render('layouts/user-edit', {
+    title: 'Edit Page',
+    style: '',
+    user,
+    biodata,
+    userId,
+  });
+};
+
+exports.putEditUser = (req, res, next) => {
+  const userId = req.params.id;
+  const { userName, email, password, firstName, lastName, nationality, tribe } =
+    req.body;
+
+  User.update(
+    {
+      userName,
+      email,
+      password,
+    },
+    {
+      where: {
+        id: userId,
+      },
+    }
+  )
+    .then(result => {
+      Biodata.update(
+        {
+          firstName,
+          lastName,
+          nationality,
+          tribe,
+        },
+        { where: { userId } }
+      ).then(result => {
+        res.redirect('/admin/dashboard');
+      });
+    })
+    .catch(err => console.log(err));
 };
